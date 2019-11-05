@@ -25,15 +25,26 @@ router.get('/:id', (req, res) => {
     console.log(req.params.id); // 1, 2, 3 or whatever comes after the slash
 
 
-    let query = "SELECT ID, avatar, Name, Logo, JobTitle FROM tbl_card";
+    let query =  `SELECT * FROM tbl_bio WHERE profID="${req.params.id}"`;
 
     sql.query(query, (err, result) => {
         if (err) { throw err; console.log(err); }
 
         console.log(result); // should see objects wrapped in an array
 
+        //convert the social property into an array
+        // before we send it thru
+        // map is an array method that lets you map one value to another (convert it)
+        result[0].social = result[0].social.split(",").map(function(item) {
+            item = item.trim();
+            // item.trim() removes any empty white space from text
+            return item;
+        })
+
+        console.log("after trim / conversation: ", result[0]);
+
         // render the home view with dynamic data
-        res.render('home', { people: result });
+        res.json(result[0]);
     })
 })
 
